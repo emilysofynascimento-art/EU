@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BioPreserve // Central de Operações</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+:root {
+    --navy: #111827;
+    --blue: #2563eb;
+    --cyan: #00e5ff;
+    --pink: #ff1493;
+    --yellow: #fff200;
+    --orange: #ff7a00;
+    --green: #39ff14;
+    --red: #ff3030;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            #eee9d2 0px,
+            #eee9d2 3px,
+            #f8f4df 4px
+        );
+    color: #111;
+    overflow-x: hidden;
+}
+
+/* =========================================================
+   INTERFACE
+   ========================================================= */
+
+#game {
+    min-height: 100vh;
+    filter: blur(11px);
+    transition: filter .7s ease;
+}
+
+#game.active {
+    filter: blur(0);
+}
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
+.top {
+    min-height: 74px;
+    background: #111;
+    color: white;
+    border-bottom: 7px solid var(--pink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+.logo {
+    font-size: 1.25rem;
+    font-weight: 1000;
+    color: var(--yellow);
+    text-shadow: 3px 3px var(--pink);
+    white-space: nowrap;
+}
+
+.timer {
+    font-family: monospace;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #111;
+    background: white;
+    border: 4px solid var(--cyan);
+    box-shadow: 5px 5px var(--pink);
+    padding: 7px 14px;
+    min-width: 125px;
+    text-align: center;
+}
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+
+.layout {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    min-height: calc(100vh - 74px);
+}
+
+.sidebar {
+    background: #111827;
+    color: white;
+    padding: 18px 12px;
+    border-right: 5px solid #000;
+}
+
+.sidebar h3 {
+    color: var(--cyan);
+    margin-bottom: 18px;
+    font-size: 1rem;
+}
+
+.nav {
+    display: grid;
+    gap: 7px;
+}
+
+.nav div {
+    padding: 10px;
+    border: 2px solid #334155;
+    background: #1e293b;
+    font-size: .78rem;
+    cursor: pointer;
+}
+
+.nav div:nth-child(2n) {
+    color: var(--yellow);
+}
+
+.nav div:hover {
+    background: #334155;
+}
+
+.main {
+    padding: 18px;
+    max-width: 1250px;
+    width: 100%;
+    margin: auto;
+}
+
+/* =========================================================
+   ALERTAS
+   ========================================================= */
+
+.ticker {
+    background: var(--red);
+    color: white;
+    border: 4px solid #111;
+    padding: 8px;
+    font-weight: 1000;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 12px;
+}
+
+.ticker span {
+    display: inline-block;
+    animation: ticker 9s linear infinite;
+}
+
+@keyframes ticker {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.warning {
+    background: var(--yellow);
+    border: 5px solid #111;
+    box-shadow: 7px 7px #111;
+    padding: 13px;
+    margin-bottom: 15px;
+    animation: pulse .7s infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        transform: rotate(-.3deg);
+    }
+
+    to {
+        transform: rotate(.3deg);
+    }
+}
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+}
+
+.box {
+    border: 4px solid #111;
+    padding: 14px;
+    background: white;
+    box-shadow: 5px 5px #555;
+}
+
+.col-3 {
+    grid-column: span 3;
+}
+
+.col-4 {
+    grid-column: span 4;
+}
+
+.col-5 {
+    grid-column: span 5;
+}
+
+.col-6 {
+    grid-column: span 6;
+}
+
+.col-7 {
+    grid-column: span 7;
+}
+
+.col-8 {
+    grid-column: span 8;
+}
+
+.col-12 {
+    grid-column: span 12;
+}
+
+/* =========================================================
+   CORES
+   ========================================================= */
+
+.yellow {
+    background: var(--yellow);
+}
+
+.cyan {
+    background: var(--cyan);
+}
+
+.pink {
+    background: var(--pink);
+    color: white;
+}
+
+.orange {
+    background: var(--orange);
+}
+
+.green {
+    background: var(--green);
+}
+
+.blue {
+    background: #4169e1;
+    color: white;
+}
+
+.red {
+    background: var(--red);
+    color: white;
+}
+
+/* =========================================================
+   ANIMAÇÕES
+   ========================================================= */
+
+.flash {
+    animation: flash .5s infinite alternate;
+}
+
+@keyframes flash {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: .25;
+    }
+}
+
+.shake {
+    animation: shake .22s infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(3px);
+    }
+
+    50% {
+        transform: translateX(-3px);
+    }
+
+    75% {
+        transform: translateX(2px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.rotate {
+    transform: rotate(-1.5deg);
+}
+
+/* =========================================================
+   MÉTRICAS
+   ========================================================= */
+
+.metric {
+    min-height: 110px;
+}
+
+.metric small {
+    display: block;
+    font-size: .7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.metric strong {
+    font-size: 1.25rem;
+}
+
+/* =========================================================
+   DISTRAÇÕES / ANÚNCIOS
+   ========================================================= */
+
+.ad {
+    min-height: 145px;
+    text-align: center;
+}
+
+.ad h2 {
+    font-size: 1.45rem;
+    margin-bottom: 9px;
+    font-weight: 1000;
+}
+
+.ad p {
+    font-size: .8rem;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.fake {
+    margin-top: 10px;
+    padding: 8px 13px;
+    background: white;
+    color: #111;
+    border: 4px outset #aaa;
+    font-weight: 1000;
+    cursor: pointer;
+}
+
+/* =========================================================
+   INFORMAÇÕES INDIVIDUAIS
+   ========================================================= */
+
+.info-card {
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.info-card small {
+    font-size: .7rem;
+    font-weight: 1000;
+    text-transform: uppercase;
+}
+
+.info-card strong {
+    font-size: 1.35rem;
+    margin-top: 10px;
+}
+
+.code {
+    font-family: monospace;
+    font-weight: 1000;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 7px;
+    display: inline-block;
+}
+
+/* =========================================================
+   NOTÍCIAS
+   ========================================================= */
+
+.news {
+    height: 145px;
+    overflow: hidden;
+    border: 4px solid #111;
+    background: white;
+    padding: 10px;
+}
+
+.news h3 {
+    background: #111;
+    color: white;
+    padding: 5px;
+    margin-bottom: 8px;
+}
+
+.news p {
+    font-size: .72rem;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 9px;
+}
+
+.badges span {
+    padding: 5px 7px;
+    border: 2px solid #111;
+    font-size: .65rem;
+    font-weight: 1000;
+}
+
+/* =========================================================
+   MAPA
+   ========================================================= */
+
+.map {
+    min-height: 150px;
+    background:
+        linear-gradient(90deg, transparent 48%, #111 49%, #111 51%, transparent 52%),
+        linear-gradient(0deg, transparent 48%, #111 49%, #111 51%, transparent 52%),
+        #83d5e0;
+    border: 4px solid #111;
+    padding: 10px;
+}
+
+.map-content {
+    font-size: 1.1rem;
+    line-height: 2;
+}
+
+/* =========================================================
+   TAREFA REAL
+   ========================================================= */
+
+.real-task {
+    background: #f8fafc;
+    border: 6px double #111;
+    padding: 20px;
+    position: relative;
+}
+
+.real-task h2 {
+    margin-bottom: 7px;
+    font-size: 1.35rem;
+}
+
+.real-task .hint {
+    color: #475569;
+    font-size: .82rem;
+    margin-bottom: 17px;
+}
+
+.form {
+    display: grid;
+    gap: 13px;
+}
+
+.field {
+    display: grid;
+    gap: 5px;
+}
+
+.field label {
+    font-size: .8rem;
+    font-weight: 900;
+}
+
+.field input {
+    width: 100%;
+    padding: 11px;
+    border: 2px solid #64748b;
+    background: white;
+    font-size: .9rem;
+    outline: none;
+}
+
+.field input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.2);
+}
+
+.submit {
+    border: 4px solid #111;
+    background: #111827;
+    color: white;
+    padding: 13px;
+    font-weight: 1000;
+    cursor: pointer;
+    font-size: .95rem;
+    box-shadow: 5px 5px var(--pink);
+}
+
+.submit:hover {
+    background: #263244;
+}
+
+/* =========================================================
+   MARQUEE
+   ========================================================= */
+
+.marquee {
+    overflow: hidden;
+    background: #111;
+    color: var(--green);
+    border: 3px solid #ff00ff;
+    padding: 6px;
+    white-space: nowrap;
+    font-family: monospace;
+    font-weight: 1000;
+}
+
+.marquee span {
+    display: inline-block;
+    animation: ticker 5s linear infinite;
+}
+
+/* =========================================================
+   OVERLAY INICIAL
+   ========================================================= */
+
+#start-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(15, 23, 42, .68);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    visibility: visible;
+    transition:
+        opacity .7s ease,
+        visibility .7s ease,
+        backdrop-filter .7s ease;
+}
+
+#start-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+}
+
+.start-card {
+    text-align: center;
+    color: white;
+    padding: 25px;
+}
+
+.start-card h1 {
+    font-size: clamp(2rem, 7vw, 4rem);
+    text-shadow: 4px 4px var(--pink);
+    margin-bottom: 10px;
+}
+
+.start-card p {
+    margin-bottom: 28px;
+    color: #e2e8f0;
+    font-weight: 700;
+}
+
+.start-button {
+    padding: 21px 42px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 1000;
+    cursor: pointer;
+    box-shadow: 0 12px 40px rgba(124,92,255,.55);
+    transition: transform .2s ease;
+}
+
+.start-button:hover {
+    transform: scale(1.08);
+}
+
+/* =========================================================
+   RESULTADO
+   ========================================================= */
+
+#result-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(0,0,0,.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .4s ease, visibility .4s ease;
+}
+
+#result-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.result-card {
+    width: min(500px, 100%);
+    background: white;
+    border: 8px solid #111;
+    box-shadow: 12px 12px var(--pink);
+    padding: 35px 25px;
+    text-align: center;
+}
+
+.result-card h2 {
+    font-size: 2.1rem;
+    margin-bottom: 10px;
+}
+
+.final-time {
+    font-family: monospace;
+    font-size: 3rem;
+    color: var(--blue);
+    font-weight: 1000;
+    margin: 20px 0;
+}
+
+.restart {
+    background: #111;
+    color: white;
+    border: 0;
+    padding: 13px 22px;
+    font-weight: 1000;
+    cursor: pointer;
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .col-3,
+    .col-4,
+    .col-5,
+    .col-6,
+    .col-7,
+    .col-8 {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .top {
+        min-height: 62px;
+        padding: 8px 10px;
+    }
+
+    .logo {
+        font-size: .85rem;
+    }
+
+    .timer {
+        font-size: 1.05rem;
+        min-width: 105px;
+        padding: 6px;
+    }
+
+    .main {
+        padding: 10px;
+    }
+
+    .col-3,
+    .col-4,
+    .col-5,
+    .col-6,
+    .col-7,
+    .col-8 {
+        grid-column: span 12;
+    }
+
+    .start-button {
+        width: 90vw;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <header class="top">
+
+        <div class="logo">
+            BIO-PRESERVE // OPERAÇÕES
+        </div>
+
+        <div class="timer" id="timer">
+            00.000
+        </div>
+
+    </header>
+
+
+    <div class="layout">
+
+        <!-- =================================================
+             MENU LATERAL
+             ================================================= -->
+
+        <aside class="sidebar">
+
+            <h3>MENU CENTRAL</h3>
+
+            <div class="nav">
+
+                <div>📊 DASHBOARD</div>
+                <div>📡 SINAIS GPS</div>
+                <div>🐾 FAUNA</div>
+                <div>🚨 OCORRÊNCIAS</div>
+                <div>🗺️ MAPAS</div>
+                <div>📋 RELATÓRIOS</div>
+                <div>👥 EQUIPES</div>
+                <div>⚙️ SISTEMA</div>
+                <div>🔔 NOTIFICAÇÕES (17)</div>
+                <div>❓ CENTRAL DE AJUDA</div>
+
+            </div>
+
+            <br>
+
+            <div class="box orange">
+
+                <strong>STATUS</strong>
+
+                <p style="font-size:.7rem;margin-top:8px;">
+                    27 agentes online<br>
+                    8 alertas ativos<br>
+                    143 registros
+                </p>
+
+            </div>
+
+        </aside>
+
+
+        <main class="main">
+
+            <!-- =================================================
+                 ALERTAS
+                 ================================================= -->
+
+            <div class="ticker">
+
+                <span>
+                    !!! ALERTA !!! NOVO SINAL DETECTADO !!!
+                    ATUALIZAÇÃO DO SISTEMA !!!
+                    NÃO IGNORE ESTA MENSAGEM !!!
+                    VERIFIQUE OS DADOS !!!
+                </span>
+
+            </div>
+
+
+            <div class="warning">
+
+                ⚠ ATENÇÃO: SISTEMA DE MONITORAMENTO OPERACIONAL ⚠
+
+                &nbsp;&nbsp; | &nbsp;&nbsp;
+
+                Última sincronização: 14:37:21
+
+                &nbsp;&nbsp; | &nbsp;&nbsp;
+
+                PRIORIDADE ALTA
+
+            </div>
+
+
+            <div class="grid">
+
+
+                <!-- =================================================
+                     INFORMAÇÕES ESPALHADAS
+                     ================================================= -->
+
+                <div class="box metric yellow col-3">
+
+                    <small>
+                        Espécie monitorada
+                    </small>
+
+                    <strong>
+                        CAPIVARA
+                    </strong>
+
+                </div>
+
+
+                <div class="box metric cyan col-3">
+
+                    <small>
+                        Último sinal
+                    </small>
+
+                    <strong>
+                        4 MIN<br>
+                        ATRÁS
+                    </strong>
+
+                </div>
+
+
+                <div class="box metric pink flash col-3">
+
+                    <small>
+                        Status da equipe
+                    </small>
+
+                    <strong>
+                        PRONTA
+                    </strong>
+
+                </div>
+
+
+                <div class="box metric green col-3">
+
+                    <small>
+                        Nível de bateria
+                    </small>
+
+                    <strong>
+                        87%
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     PRIMEIRA DISTRAÇÃO
+                     ================================================= -->
+
+                <div class="box ad pink col-4 shake">
+
+                    <h2>
+                        VOCÊ GANHOU!
+                    </h2>
+
+                    <p>
+                        Uma oportunidade absolutamente
+                        imperdível foi encontrada.
+                    </p>
+
+                    <button class="fake">
+                        CLIQUE AQUI!!!
+                    </button>
+
+                </div>
+
+
+                <div class="box ad yellow col-4 rotate">
+
+                    <h2>
+                        ⚡ URGENTE ⚡
+                    </h2>
+
+                    <p>
+                        Seu acesso pode expirar
+                        nos próximos 30 segundos!
+                    </p>
+
+                    <button class="fake">
+                        RESOLVER AGORA
+                    </button>
+
+                </div>
+
+
+                <div class="box ad orange col-4 flash">
+
+                    <h2>
+                        99% OFF
+                    </h2>
+
+                    <p>
+                        Promoção especial para
+                        operadores selecionados.
+                    </p>
+
+                    <button class="fake">
+                        APROVEITAR
+                    </button>
+
+                </div>
+
+
+                <!-- =================================================
+                     GPS SEPARADO
+                     ================================================= -->
+
+                <div class="box blue info-card col-4">
+
+                    <small>
+                        Identificação do equipamento
+                    </small>
+
+                    <p>
+                        Código do transmissor:
+                    </p>
+
+                    <strong>
+                        <span class="code">
+                            JUBI-2026
+                        </span>
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     INFORMAÇÃO FALSA
+                     ================================================= -->
+
+                <div class="box col-4">
+
+                    <h3>
+                        HISTÓRICO DE SINAIS
+                    </h3>
+
+                    <p style="margin-top:10px;font-size:.75rem;">
+                        14:31 — Sinal estabilizado
+                    </p>
+
+                    <p style="font-size:.75rem;">
+                        14:32 — Operador conectado
+                    </p>
+
+                    <p style="font-size:.75rem;">
+                        14:35 — Sistema atualizado
+                    </p>
+
+                    <p style="font-size:.75rem;">
+                        14:39 — Verificação pendente
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     NOME SEPARADO
+                     ================================================= -->
+
+                <div class="box yellow info-card col-4">
+
+                    <small>
+                        Registro de fauna
+                    </small>
+
+                    <p>
+                        Identificação informal:
+                    </p>
+
+                    <strong>
+                        "JUBILEU"
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     NOTÍCIAS
+                     ================================================= -->
+
+                <div class="box col-5">
+
+                    <div class="news">
+
+                        <h3>
+                            ÚLTIMAS NOTÍCIAS
+                        </h3>
+
+                        <p>
+                            14:39 — Equipe 04 entrou
+                            em deslocamento.
+                        </p>
+
+                        <p>
+                            14:37 — Novo sinal detectado.
+                        </p>
+
+                        <p>
+                            14:36 — Banco de dados sincronizado.
+                        </p>
+
+                        <p>
+                            14:35 — Atualização de protocolo.
+                        </p>
+
+                        <p>
+                            14:31 — Atenção para operadores.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     SETOR SEPARADO
+                     ================================================= -->
+
+                <div class="box cyan info-card col-4">
+
+                    <small>
+                        Área operacional
+                    </small>
+
+                    <p>
+                        Região atualmente associada
+                        ao sinal:
+                    </p>
+
+                    <strong>
+                        <span class="code">
+                            Setor B4
+                        </span>
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     DISTRAÇÃO
+                     ================================================= -->
+
+                <div class="box red shake col-3">
+
+                    <h2>
+                        ⚠ ALERTA ⚠
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        NÃO FECHE ESTA JANELA.
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     BANNERS
+                     ================================================= -->
+
+                <div class="box blue col-5">
+
+                    <h2 class="flash">
+                        !!! CLIQUE PARA CONFIRMAR !!!
+                    </h2>
+
+                    <p style="margin-top:10px;">
+                        A confirmação pode melhorar
+                        o desempenho do sistema.
+                    </p>
+
+                    <button class="fake">
+                        CONFIRMAR
+                    </button>
+
+                </div>
+
+
+                <div class="box green col-4">
+
+                    <h2>
+                        SUPER OFERTA
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        Ganhe pontos por completar
+                        seu cadastro.
+                    </p>
+
+                    <button class="fake">
+                        GANHAR PONTOS
+                    </button>
+
+                </div>
+
+
+                <div class="box pink col-3 flash">
+
+                    <h2>
+                        NOVIDADE!
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        Novo painel disponível.
+                    </p>
+
+                    <button class="fake">
+                        ABRIR PAINEL
+                    </button>
+
+                </div>
+
+
+                <!-- =================================================
+                     ISCA SEPARADA
+                     ================================================= -->
+
+                <div class="box orange info-card col-4">
+
+                    <small>
+                        Protocolo alimentar
+                    </small>
+
+                    <p>
+                        Recomendação para aproximação:
+                    </p>
+
+                    <strong>
+                        <span class="code">
+                            Melancia
+                        </span>
+                    </strong>
+
+                </div>
+
+
+                <!-- =================================================
+                     OUTRAS INFORMAÇÕES
+                     ================================================= -->
+
+                <div class="box col-4">
+
+                    <h3>
+                        REGISTRO TÉCNICO
+                    </h3>
+
+                    <div class="badges">
+
+                        <span class="yellow">
+                            GPS ONLINE
+                        </span>
+
+                        <span class="cyan">
+                            SAT 08
+                        </span>
+
+                        <span class="pink">
+                            PRIORIDADE
+                        </span>
+
+                        <span class="green">
+                            DADOS VÁLIDOS
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="box blue col-4">
+
+                    <h2>
+                        MAPA AO VIVO
+                    </h2>
+
+                    <div class="map-content">
+
+                        ● ● ● ● ● ● ● ●<br>
+                        ● 📍 ● ● 🌳 ● 📍 ●<br>
+                        ● ● ● 🐾 ● ● ● ●<br>
+                        ● ● ● ● ● 📍 ● ●
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     MAIS DISTRAÇÕES
+                     ================================================= -->
+
+                <div class="box yellow col-6">
+
+                    <h2 class="shake">
+                        VOCÊ ESTÁ PERDENDO TEMPO!
+                    </h2>
+
+                    <p style="margin-top:10px;">
+
+                        Existem 14 notificações novas
+                        aguardando leitura.
+
+                        Clique em qualquer uma
+                        para verificar.
+
+                    </p>
+
+                    <div class="badges">
+
+                        <span>URGENTE</span>
+                        <span>IMPORTANTE</span>
+                        <span>NOVO</span>
+                        <span>ATUALIZADO</span>
+                        <span>REVISAR</span>
+                        <span>PENDENTE</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="box orange col-3">
+
+                    <h2>
+                        PRÊMIO
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        Você está entre os operadores
+                        selecionados.
+                    </p>
+
+                    <button class="fake">
+                        VER PRÊMIO
+                    </button>
+
+                </div>
+
+
+                <div class="box cyan col-3">
+
+                    <h2>
+                        SISTEMA
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        Operação normal.
+                    </p>
+
+                    <p style="margin-top:5px;">
+                        98.7% disponibilidade
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     TAREFA REAL
+                     ================================================= -->
+
+                <section class="real-task col-6">
+
+                    <h2>
+                        🚀 PROTOCOLO DE ACIONAMENTO
+                    </h2>
+
+                    <p class="hint">
+
+                        Preencha os dados corretos
+                        encontrados na central para
+                        confirmar o despacho da equipe.
+
+                    </p>
+
+
+                    <form id="rescue-form" class="form">
+
+
+                        <div class="field">
+
+                            <label for="gps">
+                                Código do Transmissor GPS
+                            </label>
+
+                            <input
+                                id="gps"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Digite o código"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="sector">
+                                Setor de Localização
+                            </label>
+
+                            <input
+                                id="sector"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Digite o setor"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="food">
+                                Isca Recomendada
+                            </label>
+
+                            <input
+                                id="food"
+                                type="text"
+                                autocomplete="off"
+                                placeholder="Digite a isca"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            class="submit"
+                            type="submit"
+                        >
+                            CONFIRMAR E DISPARAR RESGATE
+                        </button>
+
+                    </form>
+
+                </section>
+
+
+                <!-- =================================================
+                     DISTRAÇÃO AO LADO DA TAREFA
+                     ================================================= -->
+
+                <div class="box pink col-6">
+
+                    <h2 class="flash">
+                        ATUALIZAÇÃO OBRIGATÓRIA
+                    </h2>
+
+                    <p style="margin-top:10px;">
+                        Uma nova versão do sistema
+                        está disponível.
+                    </p>
+
+                    <button class="fake">
+                        ATUALIZAR AGORA
+                    </button>
+
+                </div>
+
+
+                <div class="box red col-4">
+
+                    <h2>
+                        🚨 PRIORIDADE
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        Verifique todos os registros
+                        antes de continuar.
+                    </p>
+
+                </div>
+
+
+                <div class="box green col-4">
+
+                    <h2>
+                        OPERADORES
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        27 conectados
+                    </p>
+
+                    <p>
+                        8 em campo
+                    </p>
+
+                </div>
+
+
+                <div class="box yellow col-4">
+
+                    <h2>
+                        AVISO
+                    </h2>
+
+                    <p style="margin-top:8px;">
+                        O sistema detectou
+                        uma atividade incomum.
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     BARRA FINAL
+                     ================================================= -->
+
+                <div class="box col-12">
+
+                    <div class="marquee">
+
+                        <span>
+                            SISTEMA ONLINE ///
+                            GPS ONLINE ///
+                            BANCO SINCRONIZADO ///
+                            NOVA NOTIFICAÇÃO ///
+                            ALERTA B4 ///
+                            CLIQUE AQUI ///
+                            ATUALIZAÇÃO DISPONÍVEL ///
+                            SISTEMA ONLINE ///
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     TELA INICIAL
+     ========================================================= -->
+
+<div id="start-overlay">
+
+    <div class="start-card">
+
+        <h1>
+            CENTRAL BIO-PRESERVE
+        </h1>
+
+        <p>
+            Localize as informações necessárias
+            na interface e complete o protocolo.
+        </p>
+
+        <button
+            id="start-button"
+            class="start-button"
+        >
+            INICIAR
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     RESULTADO
+     ========================================================= -->
+
+<div id="result-overlay">
+
+    <div class="result-card">
+
+        <h2>
+            PROTOCOLO CONCLUÍDO!
+        </h2>
+
+        <p>
+            Os dados foram encontrados
+            e o procedimento foi concluído.
+        </p>
+
+        <div
+            id="final-time"
+            class="final-time"
+        >
+            00.000
+        </div>
+
+        <p>
+            Tempo necessário para localizar
+            e filtrar as informações.
+        </p>
+
+        <br>
+
+        <button
+            id="restart"
+            class="restart"
+        >
+            JOGAR NOVAMENTE
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DADOS CORRETOS
+   ========================================================= */
+
+const CORRECT_GPS = "jubi-2026";
+const CORRECT_SECTOR = "setor b4";
+const CORRECT_FOOD = "melancia";
+
+
+/* =========================================================
+   ELEMENTOS
+   ========================================================= */
+
+const game =
+    document.getElementById("game");
+
+const startOverlay =
+    document.getElementById("start-overlay");
+
+const startButton =
+    document.getElementById("start-button");
+
+const timer =
+    document.getElementById("timer");
+
+const form =
+    document.getElementById("rescue-form");
+
+const resultOverlay =
+    document.getElementById("result-overlay");
+
+const finalTime =
+    document.getElementById("final-time");
+
+const restart =
+    document.getElementById("restart");
+
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+
+let gameRunning = false;
+let startTime = 0;
+let animationFrame = null;
+
+
+/* =========================================================
+   FORMATAÇÃO DO TEMPO
+   ========================================================= */
+
+function formatTime(ms) {
+
+    const totalSeconds =
+        Math.floor(ms / 1000);
+
+    const milliseconds =
+        ms % 1000;
+
+    return (
+        String(totalSeconds).padStart(2, "0") +
+        "." +
+        String(milliseconds).padStart(3, "0")
+    );
+}
+
+
+/* =========================================================
+   CRONÔMETRO
+   ========================================================= */
+
+function updateTimer() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+    const elapsed =
+        performance.now() - startTime;
+
+    timer.textContent =
+        formatTime(Math.floor(elapsed));
+
+    animationFrame =
+        requestAnimationFrame(updateTimer);
+}
+
+
+/* =========================================================
+   INICIAR
+   ========================================================= */
+
+function startGame() {
+
+    if (gameRunning) {
+        return;
+    }
+
+    startTime =
+        performance.now();
+
+    gameRunning = true;
+
+    timer.textContent =
+        "00.000";
+
+    game.classList.add("active");
+
+    startOverlay.classList.add("hidden");
+
+    cancelAnimationFrame(animationFrame);
+
+    animationFrame =
+        requestAnimationFrame(updateTimer);
+}
+
+
+/* =========================================================
+   FORMULÁRIO
+   ========================================================= */
+
+form.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    const gps =
+        document
+            .getElementById("gps")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const sector =
+        document
+            .getElementById("sector")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const food =
+        document
+            .getElementById("food")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const elapsed =
+        Math.floor(
+            performance.now() - startTime
+        );
+
+
+    /* =====================================================
+       RESPOSTA CORRETA
+       ===================================================== */
+
+    if (
+        gps === CORRECT_GPS &&
+        sector === CORRECT_SECTOR &&
+        food === CORRECT_FOOD
+    ) {
+
+        gameRunning = false;
+
+        cancelAnimationFrame(animationFrame);
+
+        timer.textContent =
+            formatTime(elapsed);
+
+        finalTime.textContent =
+            formatTime(elapsed);
+
+        resultOverlay.classList.add("show");
+
+    }
+
+
+    /* =====================================================
+       RESPOSTA ERRADA
+       ===================================================== */
+
+    else {
+
+        /*
+           O cronômetro NÃO para.
+           O participante pode corrigir os dados,
+           mas o tempo dos erros continua contando.
+        */
+
+        alert(
+            "Dados incorretos. Revise as informações e tente novamente."
+        );
+
+    }
+
+});
+
+
+/* =========================================================
+   BOTÕES FALSOS
+   ========================================================= */
+
+document
+    .querySelectorAll(".fake")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                const original =
+                    this.textContent;
+
+                this.textContent =
+                    "NÃO ERA ESTE!";
+
+                setTimeout(() => {
+
+                    this.textContent =
+                        original;
+
+                }, 700);
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   REINICIAR
+   ========================================================= */
+
+restart.addEventListener(
+    "click",
+    function() {
+
+        gameRunning = false;
+
+        cancelAnimationFrame(animationFrame);
+
+        timer.textContent =
+            "00.000";
+
+        form.reset();
+
+        resultOverlay.classList.remove("show");
+
+        game.classList.remove("active");
+
+        startOverlay.classList.remove("hidden");
+
+    }
+);
+
+
+/* =========================================================
+   BOTÃO INICIAL
+   ========================================================= */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+</script>
+
+</body>
+</html>
